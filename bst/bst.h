@@ -1,6 +1,7 @@
 #pragma once
-#include <iostream>
 #include <initializer_list>
+//#include <random>
+//#include <chrono>
 
 class BST {
 private:
@@ -10,11 +11,17 @@ private:
         Node* left;
     };
     Node* root;
+    size_t size;
 
+    bool search_recursive(Node* current, const int& val);
+    Node* insert_recursive(Node* current, const int& val);
 public:
     BST();
-    BST(std::initializer_list<int> list);
+    BST(std::initializer_list<int> tree);
     ~BST();
-    void search();
+    void clear();
+    bool search(const int& val);
     void insert(const int& val);
+    bool empty();
+    void inorder_traversal();
 };

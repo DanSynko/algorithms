@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "bst.h"
 
-TEST(BST_Test, TestSearch) {
-  EXPECT_EQ(1, 1);
-  EXPECT_TRUE(true);
+TEST(BSTtest, BST_search_test) {
+	BST bst = { 50, 49, 51 };
+	ASSERT_TRUE(bst.search(51));
 }
