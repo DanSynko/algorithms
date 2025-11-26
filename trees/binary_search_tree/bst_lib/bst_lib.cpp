@@ -1,5 +1,31 @@
-﻿#include "bst_lib.h"
+﻿#include <iostream>
+#include "bst_lib.h"
 
+
+// ========================================================================================================================================================================
+// ========================================================================================================================================================================
+//                                                                             BINARY SEARCH TREE
+// ========================================================================================================================================================================
+// ========================================================================================================================================================================
+
+
+BST::BST() : root(nullptr), size(0) {}
+
+BST::BST(std::initializer_list<int> tree) : root(nullptr), size(0) {
+    for (const int& i : tree) {
+        Node* newNode = new Node{ i, nullptr, nullptr };
+        if (root == nullptr) {
+            root = newNode;
+        }
+        else {
+            insert(i);
+        }
+    }
+}
+BST::~BST() {
+    postorder_delete_recursive(root);
+}
+// --------------------------------------------------------------------------- PRIVATE METHODS ---------------------------------------------------------------------------
 bool BST::search_recursive(Node* current, const int& val) {
     if (current == nullptr) {
         return false;
@@ -14,19 +40,26 @@ bool BST::search_recursive(Node* current, const int& val) {
     }
     return true;
 }
-BST::Node* BST::find_Node_recursive(Node* current, const int& val) {
+BST::Node* BST::remove_recursive(Node* current, const int& val) {
     if (current == nullptr) {
         return nullptr;
     }
-    if (current->left->data == val || current->right->data == val) {
-        return current;
+    if (val < current->data) {
+        current->left = remove_recursive(current->left, val);
+    }
+    else if (val > current->data) {
+        current->right = remove_recursive(current->right, val);
     }
     else {
-        if (current->data > val) {
-            return find_Node_recursive(current->left, val);
+        if (current->left == nullptr) {
+            Node* temp = current->right;
+            delete current;
+            return temp;
         }
-        else {
-            return find_Node_recursive(current->right, val);
+        else if (current->right == nullptr) {
+            Node* temp = current->left;
+            delete current;
+            return temp;
         }
     }
     return current;
@@ -48,52 +81,43 @@ BST::Node* BST::insert_recursive(Node* current, const int& val) {
 
 
 
-
-//void BST::inorder_traversal_recursive() {
-//    Node* current = root;
-//    if (current == nullptr) {
-//        std::cout << "Binary Search Tree is empty" << std::endl;
-//    }
-//    else {
-//        if (current->left != nullptr) {
-//            std::cout << current->left->data;
-//        }
-//        std::cout << current->data;
-//            if (current->right != nullptr) {
-//                std::cout << current->right->data;
-//            }
-//    }
-//}
-
-
-
-
-
-BST::BST() : root(nullptr), size(0) {}
-
-BST::BST(std::initializer_list<int> tree) : root(nullptr), size(0) {
-    for (const int& i : tree) {
-        Node* newNode = new Node{ i, nullptr, nullptr };
-        if (root == nullptr) {
-            root = newNode;
-        }
-        else {
-            insert(i);
-        }
+// --------------------------------------------------------------------------- traversals ---------------------------------------------------------------------------
+void BST::inorder_traversal_recursive(Node* current) {
+    if (current == nullptr) {
+        return;
     }
+    inorder_traversal_recursive(current->left);
+    std::cout << current->data << ". ";
+    inorder_traversal_recursive(current->right);
+}
+void BST::postorder_traversal_recursive(Node* current) {
+    if (current == nullptr) {
+        return;
+    }
+    postorder_traversal_recursive(current->left);
+    postorder_traversal_recursive(current->right);
+    std::cout << current->data << ". ";
+}
+void BST::preorder_traversal_recursive(Node* current) {
+    if (current == nullptr) {
+        return;
+    }
+    std::cout << current->data << ". ";
+    preorder_traversal_recursive(current->left);
+    preorder_traversal_recursive(current->right);
 }
 
-BST::~BST() {
-    
+
+
+void BST::postorder_delete_recursive(Node* current) {
+    if (current == nullptr) {
+        return;
+    }
+    postorder_delete_recursive(current->left);
+    postorder_delete_recursive(current->right);
+    delete current;
 }
-
-
-
-
-
-void BST::clear() {
-    size = 0;
-}
+// --------------------------------------------------------------------------- PUBLIC METHODS ---------------------------------------------------------------------------
 bool BST::search(const int& val) {
     Node* current_root = root;
     return search_recursive(current_root, val);
@@ -104,39 +128,14 @@ void BST::insert(const int& val) {
     size++;
 }
 void BST::remove(const int& val) {
-    Node* current_parent = find_Node_recursive(root, val);
-    if (current_parent == nullptr) {
-        return;
-    }
-    Node* current_left_chield = nullptr;
-    Node* current_right_chield = nullptr;
-    if (current_parent->left != nullptr && current_parent->right != nullptr) {
-        current_left_chield = current_parent->left;
-        current_right_chield = current_parent->right;
-        if (current_left_chield->data == val) {
-            delete current_left_chield;
-            current_parent->left = nullptr;
-        }
-        else if (current_right_chield->data == val) {
-            delete current_right_chield;
-            current_parent->right = nullptr;
-        }
-        else {
-            /*if (current_left_chield->left == nullptr && current_right_chield->right == nullptr) {
-                delete current_parent;
-            }*/
-            return;
-        }
-    }
-    else {
-        return;
-    }
-    size--;
+    this->root = remove_recursive(root, val);
 }
-bool BST::empty() {
-    return !root;
+void BST::inorder_traversal() {
+    inorder_traversal_recursive(root);
 }
-//void BST::inorder_traversal() {
-//    Node* current_root = root;
-//    inorder_traversal_recursive(current_root);
-//}
+void BST::postorder_traversal() {
+    postorder_traversal_recursive(root);
+}
+void BST::preorder_traversal() {
+    preorder_traversal_recursive(root);
+}

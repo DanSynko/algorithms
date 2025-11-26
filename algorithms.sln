@@ -9,6 +9,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "binary_search_tree", "binar
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Элементы решения", "Элементы решения", "{754FC069-D67B-A9D7-50A1-8D1CA196D8F1}"
 	ProjectSection(SolutionItems) = preProject
+		algorithms_timer.h = algorithms_timer.h
 		trees\binary_search_tree\bst\bst.vcxproj = trees\binary_search_tree\bst\bst.vcxproj
 	EndProjectSection
 EndProject

@@ -7,6 +7,7 @@ int main()
 
     // balanced tree with O(log N)
     BST bst = { 50, 40, 60, 35, 45, 55, 65 };
+
     std::cout << "search(51); " << std::endl;
     if (bst.search(51)) {
         std::cout << "This element exists. " << std::endl;
@@ -16,7 +17,16 @@ int main()
     }
     std::cout << "insert(20); " << std::endl;
     bst.insert(20);
+    std::cout << "remove(20); " << std::endl;
     bst.remove(20);
+    std::cout << "inorder_traversal(); " << std::endl;
+    bst.inorder_traversal();
+    std::cout << std::endl;
+    std::cout << "preorder_traversal(); " << std::endl;
+    bst.preorder_traversal();
+    std::cout << std::endl;
+    std::cout << "postorder_traversal(); " << std::endl;
+    bst.postorder_traversal();
 
     return 0;
 }
