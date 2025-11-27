@@ -4,14 +4,12 @@
 namespace alg_timer {
 	class Timer {
 	public:
-		template<typename alg>
-		static auto code_timer() {
-			auto start = std::chrono::high_resolution_clock::now();
-
-			auto end = std::chrono::high_resolution_clock::now();
-			auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-
-			return duration;
+		template<typename f>
+		static auto code_timer(f alg) {
+			auto start = std::chrono::steady_clock::now();
+			alg();
+			auto end = std::chrono::steady_clock::now();
+			return end - start;
 		}
 	};
 };

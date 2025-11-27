@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "bst_lib.h"
+#include "trees_lib.h"
 
 class BST_TEST_Fixture : public ::testing::Test {
 protected:

@@ -1,5 +1,5 @@
 ﻿#include <iostream>
-#include "bst_lib.h"
+#include "trees_lib.h"
 
 
 // ========================================================================================================================================================================
@@ -25,6 +25,70 @@ BST::BST(std::initializer_list<int> tree) : root(nullptr), size(0) {
 BST::~BST() {
     postorder_delete_recursive(root);
 }
+
+
+
+void BST::bst_work_demo() {
+    std::cout << "search(51); " << std::endl;
+    if (search(51)) {
+        std::cout << "This element exists. " << std::endl;
+    }
+    else {
+        std::cout << "This element NOT exists. " << std::endl;
+    }
+    std::cout << "insert(20); " << std::endl;
+    insert(20);
+    std::cout << "remove(40); " << std::endl;
+    remove(40);
+    std::cout << "inorder_traversal(); " << std::endl;
+    inorder_traversal();
+    std::cout << std::endl;
+    std::cout << "preorder_traversal(); " << std::endl;
+    preorder_traversal();
+    std::cout << std::endl;
+    std::cout << "postorder_traversal(); " << std::endl;
+    postorder_traversal();
+}
+
+
+void BST::bst_log_demo() {
+    std::random_device seed;
+    std::mt19937 engine(seed());
+    std::uniform_int_distribution<int> dist(0, 4999999);
+    const int elements = 4999999;
+    std::vector<int> elements_vec;
+    elements_vec.reserve(elements);
+    for (int i = 0; i < elements; i++) {
+        elements_vec.push_back(dist(engine));
+    }
+    for (const int& i : elements_vec) {
+        Node* newNode = new Node{ i, nullptr, nullptr };
+        if (root == nullptr) {
+            root = newNode;
+        }
+        else {
+            insert(i);
+        }
+    }
+}
+
+void BST::bst_lin_demo() {
+    std::vector<int> elements_vec;
+    const int elements = 5000000;
+    elements_vec.reserve(elements);
+    for (int i = 0; i < elements; i++) {
+        elements_vec[i] = i;
+    }
+    for (const int& i : elements_vec) {
+        Node* newNode = new Node{ i, nullptr, nullptr };
+        if (root == nullptr) {
+            root = newNode;
+        }
+        else {
+            insert(i);
+        }
+    }
+}
 // --------------------------------------------------------------------------- PRIVATE METHODS ---------------------------------------------------------------------------
 bool BST::search_recursive(Node* current, const int& val) {
     if (current == nullptr) {
@@ -40,6 +104,20 @@ bool BST::search_recursive(Node* current, const int& val) {
     }
     return true;
 }
+
+
+BST::Node* BST::inorder_preccesor(Node* current) {
+    while (current != nullptr && current->right != nullptr) {
+        current = current->right;
+    }
+    return current;
+}
+BST::Node* BST::inorder_succesor(Node* current) {
+    if (current->left == nullptr) {
+        return current;
+    }
+    inorder_succesor(current->left);
+}
 BST::Node* BST::remove_recursive(Node* current, const int& val) {
     if (current == nullptr) {
         return nullptr;
@@ -51,12 +129,17 @@ BST::Node* BST::remove_recursive(Node* current, const int& val) {
         current->right = remove_recursive(current->right, val);
     }
     else {
-        if (current->left == nullptr) {
+        if (current->left != nullptr && current->right != nullptr) {
+            Node* temp = inorder_succesor(current->right);
+            current->data = temp->data;
+            current->right = remove_recursive(current->right, temp->data);
+        }
+        else if (current->left == nullptr) {
             Node* temp = current->right;
             delete current;
             return temp;
         }
-        else if (current->right == nullptr) {
+        else {
             Node* temp = current->left;
             delete current;
             return temp;
@@ -64,6 +147,8 @@ BST::Node* BST::remove_recursive(Node* current, const int& val) {
     }
     return current;
 }
+
+
 BST::Node* BST::insert_recursive(Node* current, const int& val) {
     if (current == nullptr) {
         return new Node{ val, nullptr, nullptr };
@@ -139,3 +224,19 @@ void BST::postorder_traversal() {
 void BST::preorder_traversal() {
     preorder_traversal_recursive(root);
 }
+
+
+
+// ========================================================================================================================================================================
+// ========================================================================================================================================================================
+//                                                                             AVL TREE
+// ========================================================================================================================================================================
+// ========================================================================================================================================================================
+
+
+AVL::AVL() {}
+AVL::AVL(std::initializer_list<int> tree) {}
+AVL::~AVL() override {}
+
+void AVL::insert(const int& val) override {}
+void AVL::remove(const int& val) override {}
