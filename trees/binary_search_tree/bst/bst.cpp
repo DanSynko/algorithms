@@ -7,8 +7,8 @@ int main()
     std::cout << "There is an example of binary search tree with int-data. " << std::endl;
 
 
-    //BST bst = { 50, 40, 60, 35, 45, 55, 65 };
-    //bst.bst_work_demo();
+    BST bst = { 50, 40, 60, 35, 45, 55, 65 };
+    bst.bst_work_demo();
 
     std::cout << "balanced tree with O(log N)" << std::endl;
     BST bst_log;

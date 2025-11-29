@@ -4,7 +4,12 @@
 
 int main()
 {
-    std::cout << "There is an example of AVL-tree with int-data. " << std::endl;
+    std::cout << "There is an example of AVL-tree with int-data.\n " << std::endl;
+
+    std::cout << "Initializing with sorted data for demonstrating the self-balancing tree. " << std::endl;
+    AVL avl = { 10, 20, 30 };
+    avl.insert(40);
+    /*avl.bst_work_demo();*/
 
     return 0;
 }

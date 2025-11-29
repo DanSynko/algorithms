@@ -9,9 +9,9 @@
 // ========================================================================================================================================================================
 
 
-BST::BST() : root(nullptr), size(0) {}
+BST::BST() : root(nullptr) {}
 
-BST::BST(std::initializer_list<int> tree) : root(nullptr), size(0) {
+BST::BST(std::initializer_list<int> tree) : root(nullptr) {
     for (const int& i : tree) {
         Node* newNode = new Node{ i, nullptr, nullptr };
         if (root == nullptr) {
@@ -89,7 +89,7 @@ void BST::bst_lin_demo() {
         }
     }
 }
-// --------------------------------------------------------------------------- PRIVATE METHODS ---------------------------------------------------------------------------
+// --------------------------------------------------------------------------- PROTECTED METHODS ---------------------------------------------------------------------------
 bool BST::search_recursive(Node* current, const int& val) {
     if (current == nullptr) {
         return false;
@@ -118,51 +118,7 @@ BST::Node* BST::inorder_succesor(Node* current) {
     }
     inorder_succesor(current->left);
 }
-BST::Node* BST::remove_recursive(Node* current, const int& val) {
-    if (current == nullptr) {
-        return nullptr;
-    }
-    if (val < current->data) {
-        current->left = remove_recursive(current->left, val);
-    }
-    else if (val > current->data) {
-        current->right = remove_recursive(current->right, val);
-    }
-    else {
-        if (current->left != nullptr && current->right != nullptr) {
-            Node* temp = inorder_succesor(current->right);
-            current->data = temp->data;
-            current->right = remove_recursive(current->right, temp->data);
-        }
-        else if (current->left == nullptr) {
-            Node* temp = current->right;
-            delete current;
-            return temp;
-        }
-        else {
-            Node* temp = current->left;
-            delete current;
-            return temp;
-        }
-    }
-    return current;
-}
 
-
-BST::Node* BST::insert_recursive(Node* current, const int& val) {
-    if (current == nullptr) {
-        return new Node{ val, nullptr, nullptr };
-    }
-    else {
-        if (current->data > val) {
-            current->left = insert_recursive(current->left, val);
-        }
-        else {
-            current->right = insert_recursive(current->right, val);
-        }
-    }
-    return current;
-}
 
 
 
@@ -202,6 +158,51 @@ void BST::postorder_delete_recursive(Node* current) {
     postorder_delete_recursive(current->right);
     delete current;
 }
+
+// --------------------------------------------------------------------------- PRIVATE METHODS ---------------------------------------------------------------------------
+BST::Node* BST::insert_recursive(Node* current, const int& val) {
+    if (current == nullptr) {
+        return new Node{ val, nullptr, nullptr };
+    }
+    else {
+        if (current->data > val) {
+            current->left = insert_recursive(current->left, val);
+        }
+        else {
+            current->right = insert_recursive(current->right, val);
+        }
+    }
+    return current;
+}
+BST::Node* BST::remove_recursive(Node* current, const int& val) {
+    if (current == nullptr) {
+        return nullptr;
+    }
+    if (val < current->data) {
+        current->left = remove_recursive(current->left, val);
+    }
+    else if (val > current->data) {
+        current->right = remove_recursive(current->right, val);
+    }
+    else {
+        if (current->left != nullptr && current->right != nullptr) {
+            Node* temp = inorder_succesor(current->right);
+            current->data = temp->data;
+            current->right = remove_recursive(current->right, temp->data);
+        }
+        else if (current->left == nullptr) {
+            Node* temp = current->right;
+            delete current;
+            return temp;
+        }
+        else {
+            Node* temp = current->left;
+            delete current;
+            return temp;
+        }
+    }
+    return current;
+}
 // --------------------------------------------------------------------------- PUBLIC METHODS ---------------------------------------------------------------------------
 bool BST::search(const int& val) {
     Node* current_root = root;
@@ -210,7 +211,6 @@ bool BST::search(const int& val) {
 void BST::insert(const int& val) {
     Node* current_root = root;
     insert_recursive(current_root, val);
-    size++;
 }
 void BST::remove(const int& val) {
     this->root = remove_recursive(root, val);
@@ -233,10 +233,90 @@ void BST::preorder_traversal() {
 // ========================================================================================================================================================================
 // ========================================================================================================================================================================
 
+AVL::AVL() : BST() {}
+AVL::AVL(std::initializer_list<int> tree) {
+    for (const int& i : tree) {
+        Node* newNode = new Node{ i, nullptr, nullptr, 0 };
+        if (root == nullptr) {
+            root = newNode;
+        }
+        else {
+            insert(i);
+        }
+    }
+}
 
-AVL::AVL() {}
-AVL::AVL(std::initializer_list<int> tree) {}
-AVL::~AVL() override {}
+AVL::~AVL() {
+    postorder_delete_recursive(root);
+    root = nullptr;
+}
+// --------------------------------------------------------------------------- PRIVATE METHODS ----------------------------------------------------------------------------
+int AVL::get_height(Node* current) {
+    return (current == nullptr) ? -1 : current->height;
+}
+void AVL::update_height(Node* current) {
+    current->height = 1 + std::max(get_height(current->left), get_height(current->right));
+}
 
-void AVL::insert(const int& val) override {}
-void AVL::remove(const int& val) override {}
+
+int AVL::balance_factor_f(Node* current) {
+    int leftheight = -1;
+    int rightheight = -1;
+    if (current->left != nullptr) {
+        leftheight = current->left->height;
+    }
+    if (current->right != nullptr) {
+        rightheight = current->right->height;
+    }
+    return leftheight - rightheight;
+}
+
+BST::Node* AVL::insert_recursive_forAVL(Node* current, const int& val) {
+    if (current == nullptr) {
+        return new Node{ val, nullptr, nullptr, 0 };
+    }
+    else {
+        if (current->data > val) {
+            current->left = insert_recursive_forAVL(current->left, val);
+        }
+        else {
+            current->right = insert_recursive_forAVL(current->right, val);
+        } 
+    }
+    update_height(current);
+    int balance_factor = balance_factor_f(current);
+    if (balance_factor == -2) {
+        left_rotation(current, balance_factor);
+    }
+    if (balance_factor == 2) {
+        right_rotation(current);
+    }
+    return current;
+}
+//AVL::Node* AVL::remove_recursive_forAVL(Node* current, const int& val) {
+//    
+//}
+
+BST::Node* AVL::left_rotation(Node* current, int balance_factor) {
+    Node* new_parent = current->right;
+    Node* old_parent = current;
+    new_parent->left = old_parent;
+    current = nullptr;
+    update_height(new_parent);
+    return new_parent;
+}
+BST::Node* AVL::right_rotation(Node* current) {
+    Node* new_parent = current->right;
+    new_parent->left = current;
+    current = new_parent->left;
+    current->height = balance_factor_f(current);
+    new_parent->height = balance_factor_f(new_parent);
+    return new_parent;
+}
+// ----------------------------------------------------------------------- OVERRIDED PUBLIC METHODS -----------------------------------------------------------------------
+void AVL::insert(const int& val) {
+    insert_recursive_forAVL(root, val);
+}
+//void AVL::remove(const int& val) {
+//    remove_recursive_forAVL(root, val);
+//}
