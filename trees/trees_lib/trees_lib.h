@@ -66,6 +66,7 @@ private:
     /*struct Node : public BST::Node {
         int height;
     };*/
+    
 
     int get_height(Node* current);
     void update_height(Node* current);
@@ -76,6 +77,8 @@ private:
 
     Node* left_rotation(Node* current);
     Node* right_rotation(Node* current);
+    Node* RL_rotation(Node* current);
+    Node* LR_rotation(Node* current);
 
 public:
     AVL();

@@ -284,10 +284,20 @@ BST::Node* AVL::insert_recursive_forAVL(Node* current, const int& val) {
     update_height(current);
     int balance_factor = balance_factor_f(current);
     if (balance_factor == -2) {
-        current = left_rotation(current);
+        if (balance_factor_f(current->right) == 1) {
+            current = RL_rotation(current);
+        }
+        else if (balance_factor_f(current->right) == -1) {
+            current = left_rotation(current);
+        }
     }
     if (balance_factor == 2) {
-        current = right_rotation(current);
+        if (balance_factor_f(current->left) == -1) {
+            current = LR_rotation(current);
+        }
+        else if (balance_factor_f(current->left) == 1) {
+            current = right_rotation(current);
+        }
     }
     return current;
 }
@@ -313,6 +323,24 @@ BST::Node* AVL::right_rotation(Node* current) {
     old_parent->left = subtree;
     update_height(old_parent);
     update_height(new_parent);
+    return new_parent;
+}
+BST::Node* AVL::RL_rotation(Node* current) {
+    Node* old_parent = current;
+    Node* new_parent = current->right->left;
+    Node* subnode = current->right;
+    subnode = right_rotation(subnode);
+    old_parent->right = subnode;
+    old_parent = left_rotation(old_parent);
+    return new_parent;
+}
+BST::Node* AVL::LR_rotation(Node* current) {
+    Node* old_parent = current;
+    Node* new_parent = current->left->right;
+    Node* subnode = current->left;
+    subnode = left_rotation(subnode);
+    old_parent->left = subnode;
+    old_parent = right_rotation(old_parent);
     return new_parent;
 }
 // ----------------------------------------------------------------------- OVERRIDED PUBLIC METHODS -----------------------------------------------------------------------
