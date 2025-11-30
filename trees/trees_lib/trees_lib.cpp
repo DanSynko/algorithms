@@ -74,7 +74,7 @@ void BST::bst_log_demo() {
 
 void BST::bst_lin_demo() {
     std::vector<int> elements_vec;
-    const int elements = 5000000;
+    const int elements = 4999999;
     elements_vec.reserve(elements);
     for (int i = 0; i < elements; i++) {
         elements_vec[i] = i;
@@ -205,15 +205,13 @@ BST::Node* BST::remove_recursive(Node* current, const int& val) {
 }
 // --------------------------------------------------------------------------- PUBLIC METHODS ---------------------------------------------------------------------------
 bool BST::search(const int& val) {
-    Node* current_root = root;
-    return search_recursive(current_root, val);
+    return search_recursive(root, val);
 }
 void BST::insert(const int& val) {
-    Node* current_root = root;
-    insert_recursive(current_root, val);
+    insert_recursive(root, val);
 }
 void BST::remove(const int& val) {
-    this->root = remove_recursive(root, val);
+    root = remove_recursive(root, val);
 }
 void BST::inorder_traversal() {
     inorder_traversal_recursive(root);
@@ -286,10 +284,10 @@ BST::Node* AVL::insert_recursive_forAVL(Node* current, const int& val) {
     update_height(current);
     int balance_factor = balance_factor_f(current);
     if (balance_factor == -2) {
-        left_rotation(current, balance_factor);
+        current = left_rotation(current);
     }
     if (balance_factor == 2) {
-        right_rotation(current);
+        current = right_rotation(current);
     }
     return current;
 }
@@ -297,25 +295,29 @@ BST::Node* AVL::insert_recursive_forAVL(Node* current, const int& val) {
 //    
 //}
 
-BST::Node* AVL::left_rotation(Node* current, int balance_factor) {
-    Node* new_parent = current->right;
+BST::Node* AVL::left_rotation(Node* current) {
     Node* old_parent = current;
+    Node* new_parent = current->right;
+    Node* subtree = new_parent->left;
     new_parent->left = old_parent;
-    current = nullptr;
+    old_parent->right = subtree;
+    update_height(old_parent);
     update_height(new_parent);
     return new_parent;
 }
 BST::Node* AVL::right_rotation(Node* current) {
-    Node* new_parent = current->right;
-    new_parent->left = current;
-    current = new_parent->left;
-    current->height = balance_factor_f(current);
-    new_parent->height = balance_factor_f(new_parent);
+    Node* old_parent = current;
+    Node* new_parent = current->left;
+    Node* subtree = new_parent->right;
+    new_parent->right = old_parent;
+    old_parent->left = subtree;
+    update_height(old_parent);
+    update_height(new_parent);
     return new_parent;
 }
 // ----------------------------------------------------------------------- OVERRIDED PUBLIC METHODS -----------------------------------------------------------------------
 void AVL::insert(const int& val) {
-    insert_recursive_forAVL(root, val);
+    root = insert_recursive_forAVL(root, val);
 }
 //void AVL::remove(const int& val) {
 //    remove_recursive_forAVL(root, val);

@@ -74,7 +74,7 @@ private:
     Node* insert_recursive_forAVL(Node* current, const int& val);
    // Node* remove_recursive_forAVL(Node* current, const int& val);
 
-    Node* left_rotation(Node* current, int balance_factor);
+    Node* left_rotation(Node* current);
     Node* right_rotation(Node* current);
 
 public:
