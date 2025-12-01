@@ -77,7 +77,7 @@ void BST::bst_lin_demo() {
     const int elements = 4999999;
     elements_vec.reserve(elements);
     for (int i = 0; i < elements; i++) {
-        elements_vec[i] = i;
+        elements_vec.push_back(i);
     }
     for (const int& i : elements_vec) {
         Node* newNode = new Node{ i, nullptr, nullptr };
@@ -291,7 +291,7 @@ BST::Node* AVL::insert_recursive_forAVL(Node* current, const int& val) {
             current = left_rotation(current);
         }
     }
-    if (balance_factor == 2) {
+    else if (balance_factor == 2) {
         if (balance_factor_f(current->left) == -1) {
             current = LR_rotation(current);
         }
@@ -301,9 +301,53 @@ BST::Node* AVL::insert_recursive_forAVL(Node* current, const int& val) {
     }
     return current;
 }
-//AVL::Node* AVL::remove_recursive_forAVL(Node* current, const int& val) {
-//    
-//}
+AVL::Node* AVL::remove_recursive_forAVL(Node* current, const int& val) {
+    if (current == nullptr) {
+        return nullptr;
+    }
+    if (val < current->data) {
+        current->left = remove_recursive_forAVL(current->left, val);
+    }
+    else if (val > current->data) {
+        current->right = remove_recursive_forAVL(current->right, val);
+    }
+    else {
+        if (current->left != nullptr && current->right != nullptr) {
+            Node* temp = inorder_succesor(current->right);
+            current->data = temp->data;
+            current->right = remove_recursive_forAVL(current->right, temp->data);
+        }
+        else if (current->left == nullptr) {
+            Node* temp = current->right;
+            delete current;
+            return temp;
+        }
+        else {
+            Node* temp = current->left;
+            delete current;
+            return temp;
+        }
+    }
+    update_height(current);
+    int balance_factor = balance_factor_f(current);
+    if (balance_factor == -2) {
+        if (balance_factor_f(current->right) == 1) {
+            current = RL_rotation(current);
+        }
+        else if (balance_factor_f(current->right) == -1) {
+            current = left_rotation(current);
+        }
+    }
+    else  if (balance_factor == 2) {
+        if (balance_factor_f(current->left) == -1) {
+            current = LR_rotation(current);
+        }
+        else if (balance_factor_f(current->left) == 1) {
+            current = right_rotation(current);
+        }
+    }
+    return current;
+}
 
 BST::Node* AVL::left_rotation(Node* current) {
     Node* old_parent = current;
@@ -347,6 +391,24 @@ BST::Node* AVL::LR_rotation(Node* current) {
 void AVL::insert(const int& val) {
     root = insert_recursive_forAVL(root, val);
 }
-//void AVL::remove(const int& val) {
-//    remove_recursive_forAVL(root, val);
-//}
+void AVL::remove(const int& val) {
+    root = remove_recursive_forAVL(root, val);
+}
+
+void AVL::bst_lin_demo() {
+    const int elements = 19999999;
+    std::vector<int> elements_vec;
+    elements_vec.reserve(elements);
+    for (int i = 0; i < elements; i++) {
+        elements_vec.push_back(i);
+    }
+    for (const int& i : elements_vec) {
+        Node* newNode = new Node{ i, nullptr, nullptr, 0 };
+        if (root == nullptr) {
+            root = newNode;
+        }
+        else {
+            insert(i);
+        }
+    }
+}

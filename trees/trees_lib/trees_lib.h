@@ -43,7 +43,7 @@ public:
     void bst_work_demo();
 
     void bst_log_demo();
-    void bst_lin_demo();
+    virtual void bst_lin_demo();
 
     bool search(const int& val);
     virtual void insert(const int& val);
@@ -73,7 +73,7 @@ private:
     int balance_factor_f(Node* current);
 
     Node* insert_recursive_forAVL(Node* current, const int& val);
-   // Node* remove_recursive_forAVL(Node* current, const int& val);
+    Node* remove_recursive_forAVL(Node* current, const int& val);
 
     Node* left_rotation(Node* current);
     Node* right_rotation(Node* current);
@@ -86,5 +86,7 @@ public:
     ~AVL() override;
 
     void insert(const int& val) override;
-    //void remove(const int& val) override;
+    void remove(const int& val) override;
+
+    void bst_lin_demo() override;
 };
