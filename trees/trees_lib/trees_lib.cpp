@@ -231,8 +231,8 @@ void BST::preorder_traversal() {
 // ========================================================================================================================================================================
 // ========================================================================================================================================================================
 
-AVL::AVL() : BST() {}
-AVL::AVL(std::initializer_list<int> tree) {
+AVL::AVL() : root(nullptr) {}
+AVL::AVL(std::initializer_list<int> tree) : root(nullptr) {
     for (const int& i : tree) {
         Node* newNode = new Node{ i, nullptr, nullptr, 0 };
         if (root == nullptr) {
@@ -269,7 +269,7 @@ int AVL::balance_factor_f(Node* current) {
     return leftheight - rightheight;
 }
 
-BST::Node* AVL::insert_recursive_forAVL(Node* current, const int& val) {
+AVL::Node* AVL::insert_recursive_forAVL(Node* current, const int& val) {
     if (current == nullptr) {
         return new Node{ val, nullptr, nullptr, 0 };
     }
@@ -349,7 +349,7 @@ AVL::Node* AVL::remove_recursive_forAVL(Node* current, const int& val) {
     return current;
 }
 
-BST::Node* AVL::left_rotation(Node* current) {
+AVL::Node* AVL::left_rotation(Node* current) {
     Node* old_parent = current;
     Node* new_parent = current->right;
     Node* subtree = new_parent->left;
@@ -359,7 +359,7 @@ BST::Node* AVL::left_rotation(Node* current) {
     update_height(new_parent);
     return new_parent;
 }
-BST::Node* AVL::right_rotation(Node* current) {
+AVL::Node* AVL::right_rotation(Node* current) {
     Node* old_parent = current;
     Node* new_parent = current->left;
     Node* subtree = new_parent->right;
@@ -369,7 +369,7 @@ BST::Node* AVL::right_rotation(Node* current) {
     update_height(new_parent);
     return new_parent;
 }
-BST::Node* AVL::RL_rotation(Node* current) {
+AVL::Node* AVL::RL_rotation(Node* current) {
     Node* old_parent = current;
     Node* new_parent = current->right->left;
     Node* subnode = current->right;
@@ -378,7 +378,7 @@ BST::Node* AVL::RL_rotation(Node* current) {
     old_parent = left_rotation(old_parent);
     return new_parent;
 }
-BST::Node* AVL::LR_rotation(Node* current) {
+AVL::Node* AVL::LR_rotation(Node* current) {
     Node* old_parent = current;
     Node* new_parent = current->left->right;
     Node* subnode = current->left;
@@ -411,4 +411,48 @@ void AVL::bst_lin_demo() {
             insert(i);
         }
     }
+}
+
+AVL::Node* AVL::inorder_succesor(Node* current) {}
+AVL::Node* AVL::inorder_preccesor(Node* current) {}
+
+// ========================================================================================================================================================================
+// ========================================================================================================================================================================
+//                                                                             RED BLACK TREE
+// ========================================================================================================================================================================
+// ========================================================================================================================================================================
+
+RBT::RBT() : root(nullptr) {}
+
+RBT::RBT(std::initializer_list<int> tree) : root(nullptr) {
+    for (const int& i : tree) {
+        Node* newNode = new Node{ i, nullptr, nullptr, Color::black };
+        if (root == nullptr) {
+            root = newNode;
+        }
+        else {
+            insert(i);
+        }
+    }
+}
+RBT::~RBT() {
+    postorder_delete_recursive(root);
+    root = nullptr;
+}
+bool RBT::validate_properties() {
+
+}
+// --------------------------------------------------------------------------- PRIVATE METHODS ----------------------------------------------------------------------------
+RBT::Node* RBT::insert_recursive_forRBT(Node* current, const int& val) {
+
+}
+RBT::Node* RBT::remove_recursive_forRBT(Node* current, const int& val) {
+
+}
+// ----------------------------------------------------------------------- OVERRIDED PUBLIC METHODS -----------------------------------------------------------------------
+void RBT::insert(const int& val) {
+    root = insert_recursive_forRBT(root, val);
+}
+void RBT::remove(const int& val) {
+    root = remove_recursive_forRBT(root, val);
 }

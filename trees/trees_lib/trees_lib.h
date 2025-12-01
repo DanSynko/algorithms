@@ -16,11 +16,7 @@ protected:
         int data;
         Node* right;
         Node* left;
-
-        // for AVL-tree
-        int height = 0;
     };
-    Node* root;
 
     bool search_recursive(Node* current, const int& val);
 
@@ -30,9 +26,10 @@ protected:
 
     void postorder_delete_recursive(Node* current);
 
-    Node* inorder_preccesor(Node* current);
-    Node* inorder_succesor(Node* current);
+    virtual Node* inorder_preccesor(Node* current);
+    virtual Node* inorder_succesor(Node* current);
 private:
+    Node* root;
     Node* remove_recursive(Node* current, const int& val);
     Node* insert_recursive(Node* current, const int& val);
 public:
@@ -63,10 +60,16 @@ public:
 
 class AVL : public BST {
 private:
-    /*struct Node : public BST::Node {
+    struct Node : public BST::Node {
+        int data;
+        Node* right;
+        Node* left;
         int height;
-    };*/
-    
+    };
+    Node* root;
+
+    Node* inorder_succesor(Node* current);
+    Node* inorder_preccesor(Node* current);
 
     int get_height(Node* current);
     void update_height(Node* current);
@@ -90,3 +93,41 @@ public:
 
     void bst_lin_demo() override;
 };
+
+// ========================================================================================================================================================================
+// ========================================================================================================================================================================
+//                                                                             RED BLACK TREE
+// ========================================================================================================================================================================
+// ========================================================================================================================================================================
+
+class RBT : public BST {
+protected:
+    enum class Color {
+        black,
+        red
+    };
+private:
+    struct Node : public BST::Node {
+        Color color;
+    };
+    Node* root;
+    bool validate_properties();
+
+    Node* insert_recursive_forRBT(Node* current, const int& val);
+    Node* remove_recursive_forRBT(Node* current, const int& val);
+
+    void recoloring();
+
+    Node* left_rotation(Node* current);
+    Node* right_rotation(Node* current);
+    Node* RL_rotation(Node* current);
+    Node* LR_rotation(Node* current);
+public:
+    RBT();
+    RBT(std::initializer_list<int> tree);
+    ~RBT() override;
+
+    void insert(const int& val) override;
+    void remove(const int& val) override;
+};
+
