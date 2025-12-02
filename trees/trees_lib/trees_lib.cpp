@@ -387,6 +387,14 @@ AVL::Node* AVL::LR_rotation(Node* current) {
     old_parent = right_rotation(old_parent);
     return new_parent;
 }
+
+
+AVL::Node* AVL::inorder_succesor(Node* current) {
+    if (current->left == nullptr) {
+        return current;
+    }
+    inorder_succesor(current->left);
+}
 // ----------------------------------------------------------------------- OVERRIDED PUBLIC METHODS -----------------------------------------------------------------------
 void AVL::insert(const int& val) {
     root = insert_recursive_forAVL(root, val);
@@ -413,8 +421,8 @@ void AVL::bst_lin_demo() {
     }
 }
 
-AVL::Node* AVL::inorder_succesor(Node* current) {}
-AVL::Node* AVL::inorder_preccesor(Node* current) {}
+//AVL::Node* AVL::inorder_succesor(Node* current) {}
+//AVL::Node* AVL::inorder_preccesor(Node* current) {}
 
 // ========================================================================================================================================================================
 // ========================================================================================================================================================================
@@ -439,20 +447,30 @@ RBT::~RBT() {
     postorder_delete_recursive(root);
     root = nullptr;
 }
-bool RBT::validate_properties() {
-
-}
+//bool RBT::validate_properties() {
+//
+//}
 // --------------------------------------------------------------------------- PRIVATE METHODS ----------------------------------------------------------------------------
 RBT::Node* RBT::insert_recursive_forRBT(Node* current, const int& val) {
-
+    if (current == nullptr) {
+        return new Node{ val, nullptr, nullptr, Color::red };
+    }
+    else {
+        if (current->data > val) {
+            current->left = insert_recursive_forRBT(current->left, val);
+        }
+        else {
+            current->right = insert_recursive_forRBT(current->right, val);
+        }
+    }
 }
-RBT::Node* RBT::remove_recursive_forRBT(Node* current, const int& val) {
-
-}
+//RBT::Node* RBT::remove_recursive_forRBT(Node* current, const int& val) {
+//
+//}
 // ----------------------------------------------------------------------- OVERRIDED PUBLIC METHODS -----------------------------------------------------------------------
 void RBT::insert(const int& val) {
     root = insert_recursive_forRBT(root, val);
 }
-void RBT::remove(const int& val) {
-    root = remove_recursive_forRBT(root, val);
-}
+//void RBT::remove(const int& val) {
+//    root = remove_recursive_forRBT(root, val);
+//}

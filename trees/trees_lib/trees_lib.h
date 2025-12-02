@@ -16,6 +16,14 @@ protected:
         int data;
         Node* right;
         Node* left;
+        union {
+            int height;
+            enum Color {
+                black,
+                red
+            };
+            Color color;
+        };
     };
 
     bool search_recursive(Node* current, const int& val);
@@ -27,7 +35,7 @@ protected:
     void postorder_delete_recursive(Node* current);
 
     virtual Node* inorder_preccesor(Node* current);
-    virtual Node* inorder_succesor(Node* current);
+    Node* inorder_succesor(Node* current);
 private:
     Node* root;
     Node* remove_recursive(Node* current, const int& val);
@@ -68,8 +76,8 @@ private:
     };
     Node* root;
 
-    Node* inorder_succesor(Node* current);
-    Node* inorder_preccesor(Node* current);
+    /*Node* inorder_succesor(Node* current);
+    Node* inorder_preccesor(Node* current);*/
 
     int get_height(Node* current);
     void update_height(Node* current);
@@ -83,6 +91,8 @@ private:
     Node* RL_rotation(Node* current);
     Node* LR_rotation(Node* current);
 
+
+    Node* inorder_succesor(Node* current);
 public:
     AVL();
     AVL(std::initializer_list<int> tree);
@@ -102,19 +112,22 @@ public:
 
 class RBT : public BST {
 protected:
-    enum class Color {
+    enum Color {
         black,
         red
     };
 private:
     struct Node : public BST::Node {
+        int data;
+        Node* right;
+        Node* left;
         Color color;
     };
     Node* root;
-    bool validate_properties();
+    //bool validate_properties();
 
     Node* insert_recursive_forRBT(Node* current, const int& val);
-    Node* remove_recursive_forRBT(Node* current, const int& val);
+    //Node* remove_recursive_forRBT(Node* current, const int& val);
 
     void recoloring();
 
@@ -122,12 +135,14 @@ private:
     Node* right_rotation(Node* current);
     Node* RL_rotation(Node* current);
     Node* LR_rotation(Node* current);
+
+    //Node* inorder_succesor(Node* current);
 public:
     RBT();
     RBT(std::initializer_list<int> tree);
     ~RBT() override;
 
     void insert(const int& val) override;
-    void remove(const int& val) override;
+    //void remove(const int& val) override;
 };
 
