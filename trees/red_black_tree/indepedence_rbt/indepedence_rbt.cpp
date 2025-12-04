@@ -13,6 +13,7 @@ protected:
         int data;
         Node* right;
         Node* left;
+        Node* parent;
         Color color;
     };
     Node* root;
@@ -79,16 +80,55 @@ protected:
         }
         return true;
     }
-    Node* insert_recursive(Node* current, const int& val) {
+    Node* insert_recursive(Node* current, Node* current_parent, const int& val) {
         if (current == nullptr) {
-            return new Node{ val, nullptr, nullptr, Color::red };
+            return new Node{ val, nullptr, nullptr, current_parent, Color::red };
         }
         else {
             if (current->data > val) {
-                current->left = insert_recursive(current->left, val);
+                current->left = insert_recursive(current->left, current, val);
             }
             else {
-                current->right = insert_recursive(current->right, val);
+                current->right = insert_recursive(current->right, current, val);
+            }
+        }
+        if (current->parent != nullptr) {
+            if (current->color == Color::red && current->right->color == Color::red) {
+                Node* grandparent = current->parent->parent;
+                Node* left_uncle = nullptr;
+                Node* right_uncle = nullptr;
+                if (grandparent != nullptr) {
+                    if (grandparent->data < current->data) {
+                        left_uncle = current->parent->parent->left;
+                        if (left_uncle->color == Color::black || left_uncle == nullptr) {
+                            current = left_rotation(current);
+                            recoloring(left_uncle);
+                        }
+                        else {
+                            recoloring(left_uncle);
+                        }
+                    }
+                    else {
+                        right_uncle = current->parent->parent->left;
+                        if (right_uncle->color == Color::black || right_uncle == nullptr) {
+                            current = left_rotation(current);
+                            recoloring(right_uncle);
+                        }
+                        else {
+                            recoloring(right_uncle);
+                        }
+                    }
+                }
+                else {
+                    left_uncle = current->parent->left;
+                    if (left_uncle->color == Color::black || left_uncle == nullptr) {
+                        current = left_rotation(current);
+                        recoloring(left_uncle);
+                    }
+                    else {
+                        recoloring(left_uncle);
+                    }
+                }
             }
         }
         return current;
@@ -124,17 +164,34 @@ protected:
     }
 
 
-    //void recoloring() {}
+    void recoloring(Node* uncle) {
+        if (uncle->color == Color::red) {
+            if (uncle->parent == root) {
+                uncle->parent->color = Color::black;
+            }
+            else {
+                uncle->parent->color = Color::red;
+            }
+            uncle->color = Color::black;
+            if (uncle->data < uncle->parent->data) {
+                uncle->parent->right->color = Color::black;
+            }
+            else {
+                uncle->parent->left->color = Color::black;
+            }
+        }
+        else if (uncle == nullptr || uncle->color == Color::black) {
+            // ...
+        }
+    }
 
 
-    /*Node* left_rotation(Node* current) {
+    Node* left_rotation(Node* current) {
         Node* old_parent = current;
         Node* new_parent = current->right;
         Node* subtree = new_parent->left;
         new_parent->left = old_parent;
         old_parent->right = subtree;
-        update_height(old_parent);
-        update_height(new_parent);
         return new_parent;
     }
     Node* right_rotation(Node* current) {
@@ -143,8 +200,6 @@ protected:
         Node* subtree = new_parent->right;
         new_parent->right = old_parent;
         old_parent->left = subtree;
-        update_height(old_parent);
-        update_height(new_parent);
         return new_parent;
     }
     Node* RL_rotation(Node* current) {
@@ -164,7 +219,7 @@ protected:
         old_parent->left = subnode;
         old_parent = right_rotation(old_parent);
         return new_parent;
-    }*/
+    }
 
 
     void postorder_delete_recursive(Node* current) {
@@ -180,9 +235,8 @@ public:
 
     RedBlackTree(std::initializer_list<int> tree) : root(nullptr) {
         for (const int& i : tree) {
-            Node* newNode = new Node{ i, nullptr, nullptr, Color::black };
             if (root == nullptr) {
-                root = newNode;
+                root = new Node{ i, nullptr, nullptr, nullptr, Color::black };
             }
             else {
                 insert(i);
@@ -242,7 +296,8 @@ public:
         return search_recursive(root, val);
     }
     void insert(const int& val) {
-        insert_recursive(root, val);
+        Node* next_parent = root;
+        root = insert_recursive(root, next_parent, val);
     }
     void remove(const int& val) {
         root = remove_recursive(root, val);
@@ -263,7 +318,7 @@ public:
 int main()
 {
     std::cout << "There is an example of red-black-tree with int-data. " << std::endl;
-    RedBlackTree rbt = { 10, 20, 30 };
-
+    RedBlackTree rbt = { 10, 20, 5 };
+    rbt.insert(30);
     return 0;
 }
