@@ -100,32 +100,46 @@ protected:
                 if (grandparent != nullptr) {
                     if (grandparent->data < current->data) {
                         left_uncle = current->parent->parent->left;
-                        if (left_uncle->color == Color::black || left_uncle == nullptr) {
+                        if (left_uncle == nullptr) {
+                            current = left_rotation(current);
+                            current->left->color = Color::red;
+                            current->color = Color::black;
+                            current->right->color = Color::red;
+                        }
+                        else if (left_uncle->color == Color::black) {
                             current = left_rotation(current);
                             recoloring(left_uncle);
                         }
-                        else {
+                        else if(left_uncle->color == Color::red) {
                             recoloring(left_uncle);
                         }
                     }
                     else {
-                        right_uncle = current->parent->parent->left;
-                        if (right_uncle->color == Color::black || right_uncle == nullptr) {
-                            current = left_rotation(current);
-                            recoloring(right_uncle);
+                        right_uncle = current->parent->parent->right;
+                        current = right_rotation(current);
+                        if (right_uncle == nullptr) {
+                            current->right->color = Color::red;
+                            current->color = Color::black;
+                            current->left->color = Color::red;
                         }
-                        else {
+                        else if (right_uncle->color == Color::black) {
                             recoloring(right_uncle);
                         }
                     }
                 }
                 else {
                     left_uncle = current->parent->left;
-                    if (left_uncle->color == Color::black || left_uncle == nullptr) {
-                        current = left_rotation(current);
+                    if (left_uncle == nullptr) {
+                        current = left_rotation(current->parent);
+                        current->left->color = Color::red;
+                        current->color = Color::black;
+                        current->right->color = Color::red;
+                    }
+                    else if (left_uncle->color == Color::black) {
+                        current->parent = left_rotation(current->parent);
                         recoloring(left_uncle);
                     }
-                    else {
+                    else if (left_uncle->color == Color::red) {
                         recoloring(left_uncle);
                     }
                 }
@@ -180,8 +194,11 @@ protected:
                 uncle->parent->left->color = Color::black;
             }
         }
-        else if (uncle == nullptr || uncle->color == Color::black) {
-            // ...
+        else {
+            uncle->parent->color = Color::red;
+            if (uncle->parent->parent != nullptr) {
+                uncle->parent->parent->color = Color::black;
+            }
         }
     }
 
@@ -192,6 +209,19 @@ protected:
         Node* subtree = new_parent->left;
         new_parent->left = old_parent;
         old_parent->right = subtree;
+        if (subtree != nullptr) {
+            subtree->parent = old_parent;
+        }
+        if (old_parent->parent != nullptr) {
+            if (old_parent == old_parent->parent->left) {
+                old_parent->parent->left = new_parent;
+            }
+            else {
+                old_parent->parent->right = new_parent;
+            }
+        }
+        new_parent->parent = old_parent->parent;
+        old_parent->parent = new_parent;
         return new_parent;
     }
     Node* right_rotation(Node* current) {
@@ -200,6 +230,22 @@ protected:
         Node* subtree = new_parent->right;
         new_parent->right = old_parent;
         old_parent->left = subtree;
+        new_parent->parent = old_parent->parent;
+        current->parent = new_parent;
+        if (subtree != nullptr) {
+            subtree->parent = old_parent;
+        }
+        if (old_parent->parent != nullptr) {
+            if (old_parent == old_parent->parent->left) {
+                old_parent->parent->left = new_parent;
+            }
+            else {
+                old_parent->parent->right = new_parent;
+            }
+        }
+        else {
+            root = new_parent;
+        }
         return new_parent;
     }
     Node* RL_rotation(Node* current) {
@@ -318,7 +364,7 @@ public:
 int main()
 {
     std::cout << "There is an example of red-black-tree with int-data. " << std::endl;
-    RedBlackTree rbt = { 10, 20, 5 };
+    RedBlackTree rbt = { 10, 20 };
     rbt.insert(30);
     return 0;
 }
