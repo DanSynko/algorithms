@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="hashmap.cpp">
+    <ClCompile Include="hashmap_chaining.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
   </ItemGroup>

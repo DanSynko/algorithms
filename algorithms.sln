@@ -35,7 +35,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "rbt", "trees\red_black_tree
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "indepedence_rbt", "trees\red_black_tree\indepedence_rbt\indepedence_rbt.vcxproj", "{A8CA23EA-F752-4944-8D77-AF604FB43249}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "hashmap", "hashmap\hashmap.vcxproj", "{E0B6F96B-93D6-49D6-9EAC-7A1FBCE3B06A}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "hashmap", "hashmap", "{7B9AC62F-CBBE-4255-B840-71AEA1EE0929}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "hashmap_chaining", "hashmap\hashmap_chaining\hashmap_chaining.vcxproj", "{E0B6F96B-93D6-49D6-9EAC-7A1FBCE3B06A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -132,6 +134,7 @@ Global
 		{10B73C31-42BE-4F23-8B8A-1FBACE0C59B7} = {36D591C7-65C7-A0D1-1CBC-10CDE441BDC8}
 		{65A21C18-A659-416A-AB92-C661DDAA3466} = {10B73C31-42BE-4F23-8B8A-1FBACE0C59B7}
 		{A8CA23EA-F752-4944-8D77-AF604FB43249} = {10B73C31-42BE-4F23-8B8A-1FBACE0C59B7}
+		{E0B6F96B-93D6-49D6-9EAC-7A1FBCE3B06A} = {7B9AC62F-CBBE-4255-B840-71AEA1EE0929}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {908563B0-4DB4-4DC0-AA66-F56D00163F9F}
