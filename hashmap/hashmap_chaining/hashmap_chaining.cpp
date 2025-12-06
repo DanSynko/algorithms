@@ -25,7 +25,28 @@ private:
 
     
     void rehashing() {
+        hm_capacity *= 1.5;
+        Bucket** new_hm = new Bucket*[hm_capacity]();
+        Bucket* current_for_next = nullptr;
+        for (int i = 0; i < hm_capacity; i++) {
+            for (Bucket* current = buckets[i]; current != nullptr; current = current_for_next) {
+                current_for_next = current->next;
+                delete current;
+            }
+        }
         
+        buckets = new_hm;
+    }
+
+    Bucket* check_dublication(const Key& arg_key) {
+        Bucket* current = buckets[hash_function(arg_key)];
+        while (current != nullptr) {
+            if (current->key == arg_key) {
+                return current;
+            }
+            current = current->next;
+        }
+        return nullptr;
     }
 public:
     Hashmap() : hm_capacity(32), hm_size(0) {
@@ -34,21 +55,7 @@ public:
     Hashmap(std::initializer_list<std::pair<Key, Val>> hm) : hm_capacity(32), hm_size(0) {
         buckets = new Bucket*[hm_capacity]();
         for (const auto& [key, val] : hm) {
-            Bucket* newBucket = new Bucket{ key, val, nullptr };
-            size_t rand_index = hash_function(key);
-
-            if (buckets[rand_index] != nullptr) {
-                Bucket* current = buckets[rand_index];
-                while (current->next != nullptr) {
-                    current = current->next;
-                }
-                current->next = newBucket;
-            }
-            else {
-                buckets[rand_index] = newBucket;
-            }
-            newBucket->hash_code = rand_index;
-            hm_size++;
+            insert(key, val);
         }
     }
     ~Hashmap() {
@@ -64,8 +71,31 @@ public:
         hm_size = 0;
     }
 
-    void insert(Bucket* newBucket) {
+    void insert(const Key& arg_key, const Val& arg_val) {
+        Bucket* newBucket = new Bucket{ arg_key, arg_val, nullptr, hash_function(arg_key) };
 
+        /*if (hm_capacity <= hm_size) {
+            rehashing();
+        }*/
+
+        Bucket* dublicat = check_dublication(arg_key);
+        if (dublicat != nullptr) {
+            dublicat->value = newBucket->value;
+            delete newBucket;
+        }
+        else {
+            if (buckets[newBucket->hash_code] == nullptr) {
+                buckets[newBucket->hash_code] = newBucket;
+            }
+            else {
+                Bucket* current = buckets[newBucket->hash_code];
+                while (current->next != nullptr) {
+                    current = current->next;
+                }
+                current->next = newBucket;
+                hm_size++;
+            }
+        }
     }
     void remove() {
 
@@ -81,8 +111,14 @@ int main()
     Hashmap<std::string, std::string> hashmap = {
         {"Car", "BMW"},
         {"Word", "C++"},
-        {"Car", "Volkswagen"}
+        {"Rac", "Volkswagen"}
     };
 
+    std::cout << "hashmap.insert('Website', 'GitHub');" << std::endl;
+    hashmap.insert("Website", "GitHub");
+    std::cout << "hashmap.insert('Website', 'Google');  (create a dublicat)" << std::endl;
+    hashmap.insert("Website", "Google");
+    std::cout << "hashmap.insert('Website', 'Google');  (create a collision)" << std::endl;
+    hashmap.insert("Cra", "Toyota");
     return 0;
 }
