@@ -109,8 +109,30 @@ public:
             hm_size++;
         }
     }
-    void remove() {
+    void remove(const Key& arg_key) {
+        size_t index = hash_function(arg_key);
+        Bucket* current = buckets[index];
+        if (current == nullptr) {
+            return;
+        }
 
+        if (current->key == arg_key) {
+            buckets[index] = current->next;
+            delete current;
+            hm_size--;
+        }
+        else {
+            while (current->next != nullptr) {
+                if (current->next->key == arg_key) {
+                    Bucket* oldBucket = current->next;
+                    current->next = oldBucket->next;
+                    delete oldBucket;
+                    hm_size--;
+                    break;
+                }
+                current = current->next;
+            }
+        }
     }
     Bucket* search(const Key& arg_key) {
         Bucket* current = buckets[hash_function(arg_key)];
@@ -139,9 +161,12 @@ int main()
     hashmap.insert("Website", "Google");
     std::cout << "hashmap.insert('Cra', 'Toyota');  (create a collision)" << std::endl;
     hashmap.insert("Cra", "Toyota");
-    std::cout << "hashmap.insert('Cra', 'Toyota');  (create a collision)" << std::endl;
-    hashmap.insert("Cra", "Toyota");
     std::cout << "hashmap.search('Cra'); " << std::endl;
     std::cout << "Address of this key: " << hashmap.search("Cra") << ". " << std::endl;
+
+    std::cout << "hashmap.remove('Rac');" << std::endl;
+    hashmap.remove("Rac");
+
+    std::cout << "Address for key 'Rac' after removal must be: " << hashmap.search("Rac") << std::endl;
     return 0;
 }
