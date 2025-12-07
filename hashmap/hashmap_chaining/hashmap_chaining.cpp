@@ -90,6 +90,9 @@ public:
         hm_size = 0;
     }
 
+    // Time Complexity: 
+    // insert, search, remove: O(1) Average, O(N) Worst
+
     void insert(const Key& arg_key, const Val& arg_val) {
         if (hm_capacity <= hm_size) {
             rehashing();
@@ -109,8 +112,15 @@ public:
     void remove() {
 
     }
-    void search() {
-
+    Bucket* search(const Key& arg_key) {
+        Bucket* current = buckets[hash_function(arg_key)];
+        while (current != nullptr) {
+            if (current->key == arg_key) {
+                return current;
+            }
+            current = current->next;
+        }
+        return nullptr;
     }
 };
 
@@ -129,5 +139,9 @@ int main()
     hashmap.insert("Website", "Google");
     std::cout << "hashmap.insert('Cra', 'Toyota');  (create a collision)" << std::endl;
     hashmap.insert("Cra", "Toyota");
+    std::cout << "hashmap.insert('Cra', 'Toyota');  (create a collision)" << std::endl;
+    hashmap.insert("Cra", "Toyota");
+    std::cout << "hashmap.search('Cra'); " << std::endl;
+    std::cout << "Address of this key: " << hashmap.search("Cra") << ". " << std::endl;
     return 0;
 }
