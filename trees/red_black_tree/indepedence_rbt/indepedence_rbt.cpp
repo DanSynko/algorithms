@@ -95,6 +95,7 @@ protected:
 
 
 
+        // left rotation
         if (current->right != nullptr && current->right->right != nullptr) {
             if (current->right->color == Color::red && current->right->right->color == Color::red) {
                 if (current->left == nullptr) {
@@ -103,15 +104,16 @@ protected:
                     current->left->color = Color::red;
                     current->right->color = Color::red;
                 }
-                /*else if (current->left->color == Color::black) {
+                else if (current->left->color == Color::black) {
                     current = left_rotation(current);
                     recoloring(current->left);
                 }
                 else {
                     recoloring(current->left);
-                }*/
+                }
             }
         }
+        // right rotation
         else if (current->left != nullptr && current->left->left != nullptr) {
             if (current->left->color == Color::red && current->left->left->color == Color::red) {
                 if (current->right == nullptr) {
@@ -120,13 +122,49 @@ protected:
                     current->right->color = Color::red;
                     current->left->color = Color::red;
                 }
-                /*else if (current->left->color == Color::black) {
+                else if (current->left->color == Color::black) {
                     current = right_rotation(current);
+                    recoloring(current->right);
+                }
+                else {
+                    recoloring(current->right);
+                }
+            }
+        }
+        // RL
+        else if (current->right != nullptr && current->right->left != nullptr) {
+            if (current->right->color == Color::red && current->right->left->color == Color::red) {
+                if (current->left == nullptr) {
+                    current = RL_rotation(current);
+                    current->color = Color::black;
+                    current->left->color = Color::red;
+                    current->right->color = Color::red;
+                }
+                else if (current->left->color == Color::black) {
+                    current = RL_rotation(current);
                     recoloring(current->left);
                 }
                 else {
                     recoloring(current->left);
-                }*/
+                }
+            }
+        }
+        // LR
+        else if (current->left != nullptr && current->left->right != nullptr) {
+            if (current->left->color == Color::red && current->left->right->color == Color::red) {
+                if (current->right == nullptr) {
+                    current = LR_rotation(current);
+                    current->color = Color::black;
+                    current->right->color = Color::red;
+                    current->left->color = Color::red;
+                }
+                else if (current->right->color == Color::black) {
+                    current = LR_rotation(current);
+                    recoloring(current->right);
+                }
+                else {
+                    recoloring(current->right);
+                }
             }
         }
 
@@ -241,6 +279,20 @@ protected:
         Node* old_parent = current;
         Node* new_parent = current->right->left;
         Node* subnode = current->right;
+        if (subnode != nullptr) {
+            subnode->parent = old_parent;
+        }
+        if (old_parent->parent != nullptr) {
+            if (old_parent == old_parent->parent->left) {
+                old_parent->parent->left = new_parent;
+            }
+            else {
+                old_parent->parent->right = new_parent;
+            }
+        }
+        else {
+            root = new_parent;
+        }
         subnode = right_rotation(subnode);
         old_parent->right = subnode;
         old_parent = left_rotation(old_parent);
@@ -354,6 +406,7 @@ int main()
 {
     std::cout << "There is an example of red-black-tree with int-data. " << std::endl;
     RedBlackTree rbt = { 10, 20 };
-    rbt.insert(30);
+    rbt.insert(15);
+    //rbt.insert(40);
     return 0;
 }
