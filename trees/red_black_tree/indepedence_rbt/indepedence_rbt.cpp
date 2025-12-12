@@ -275,20 +275,6 @@ protected:
         Node* old_parent = current;
         Node* new_parent = current->right->left;
         Node* subnode = current->right;
-        /*if (subnode != nullptr) {
-            subnode->parent = old_parent;
-        }
-        if (old_parent->parent != nullptr) {
-            if (old_parent == old_parent->parent->left) {
-                old_parent->parent->left = new_parent;
-            }
-            else {
-                old_parent->parent->right = new_parent;
-            }
-        }
-        else {
-            root = new_parent;
-        }*/
         subnode = right_rotation(subnode);
         old_parent = left_rotation(old_parent);
         return new_parent;
