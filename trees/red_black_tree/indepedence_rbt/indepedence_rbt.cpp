@@ -80,6 +80,83 @@ protected:
         }
         return true;
     }
+
+
+
+    Node* fixup_propertions_insert(Node* current) {
+        // left rotation
+        if ((current->right != nullptr && current->right->right != nullptr) && (current->right->color == Color::red && current->right->right->color == Color::red)) {
+            if (current->left == nullptr) {
+                current = left_rotation(current);
+                current->color = Color::black;
+                current->left->color = Color::red;
+                current->right->color = Color::red;
+            }
+            else if (current->left->color == Color::black) {
+                current = left_rotation(current);
+                recoloring(current->left);
+            }
+            else {
+                recoloring(current->left);
+            }
+        }
+        // right rotation
+        else if ((current->left != nullptr && current->left->left != nullptr) && (current->left->color == Color::red && current->left->left->color == Color::red)) {
+            if (current->right == nullptr) {
+                current = right_rotation(current);
+                current->color = Color::black;
+                current->right->color = Color::red;
+                current->left->color = Color::red;
+            }
+            else if (current->left->color == Color::black) {
+                current = right_rotation(current);
+                recoloring(current->right);
+            }
+            else {
+                recoloring(current->right);
+            }
+        }
+        // RL
+        else if ((current->right != nullptr && current->right->left != nullptr) && (current->right->color == Color::red && current->right->left->color == Color::red)) {
+            if (current->left == nullptr) {
+                current = RL_rotation(current);
+                current->color = Color::black;
+                current->left->color = Color::red;
+                current->right->color = Color::red;
+            }
+            else if (current->left->color == Color::black) {
+                current = RL_rotation(current);
+                //recoloring(current->left);
+                current->left->color = Color::red;
+                current->left->parent->color = Color::black;
+            }
+            else {
+                recoloring(current->left);
+            }
+        }
+        // LR
+        else if ((current->left != nullptr && current->left->right != nullptr) && (current->left->color == Color::red && current->left->right->color == Color::red)) {
+            if (current->right == nullptr) {
+                current = LR_rotation(current);
+                current->color = Color::black;
+                current->right->color = Color::red;
+                current->left->color = Color::red;
+            }
+            else if (current->right->color == Color::black) {
+                current = LR_rotation(current);
+                recoloring(current->right);
+            }
+            else {
+                recoloring(current->right);
+            }
+        }
+        return current;
+    }
+
+    void fixup_propertions_remove(Node* current, Node* temp) {
+        current->color = temp->color;
+    }
+
     Node* insert_recursive(Node* current, Node* current_parent, const int& val) {
         if (current == nullptr) {
             return new Node{ val, nullptr, nullptr, current_parent, Color::red };
@@ -92,84 +169,7 @@ protected:
                 current->right = insert_recursive(current->right, current, val);
             }
         }
-
-
-
-        // left rotation
-        if (current->right != nullptr && current->right->right != nullptr) {
-            if (current->right->color == Color::red && current->right->right->color == Color::red) {
-                if (current->left == nullptr) {
-                    current = left_rotation(current);
-                    current->color = Color::black;
-                    current->left->color = Color::red;
-                    current->right->color = Color::red;
-                }
-                else if (current->left->color == Color::black) {
-                    current = left_rotation(current);
-                    recoloring(current->left);
-                }
-                else {
-                    recoloring(current->left);
-                }
-            }
-        }
-        // right rotation
-        else if (current->left != nullptr && current->left->left != nullptr) {
-            if (current->left->color == Color::red && current->left->left->color == Color::red) {
-                if (current->right == nullptr) {
-                    current = right_rotation(current);
-                    current->color = Color::black;
-                    current->right->color = Color::red;
-                    current->left->color = Color::red;
-                }
-                else if (current->left->color == Color::black) {
-                    current = right_rotation(current);
-                    recoloring(current->right);
-                }
-                else {
-                    recoloring(current->right);
-                }
-            }
-        }
-        // RL
-        else if (current->right != nullptr && current->right->left != nullptr) {
-            if (current->right->color == Color::red && current->right->left->color == Color::red) {
-                if (current->left == nullptr) {
-                    current = RL_rotation(current);
-                    current->color = Color::black;
-                    current->left->color = Color::red;
-                    current->right->color = Color::red;
-                }
-                else if (current->left->color == Color::black) {
-                    current = RL_rotation(current);
-                    recoloring(current->left);
-                }
-                else {
-                    recoloring(current->left);
-                }
-            }
-        }
-        // LR
-        else if (current->left != nullptr && current->left->right != nullptr) {
-            if (current->left->color == Color::red && current->left->right->color == Color::red) {
-                if (current->right == nullptr) {
-                    current = LR_rotation(current);
-                    current->color = Color::black;
-                    current->right->color = Color::red;
-                    current->left->color = Color::red;
-                }
-                else if (current->right->color == Color::black) {
-                    current = LR_rotation(current);
-                    recoloring(current->right);
-                }
-                else {
-                    recoloring(current->right);
-                }
-            }
-        }
-
-
-        return current;
+        return fixup_propertions_insert(current);
     }
     Node* remove_recursive(Node* current, const int& val) {
         if (current == nullptr) {
@@ -189,11 +189,13 @@ protected:
             }
             else if (current->left == nullptr) {
                 Node* temp = current->right;
+                current->color = temp->color;
                 delete current;
                 return temp;
             }
             else {
                 Node* temp = current->left;
+                current->color = temp->color;
                 delete current;
                 return temp;
             }
@@ -216,12 +218,6 @@ protected:
             }
             else {
                 uncle->parent->left->color = Color::black;
-            }
-        }
-        else {
-            uncle->parent->color = Color::red;
-            if (uncle->parent->parent != nullptr) {
-                uncle->parent->parent->color = Color::black;
             }
         }
     }
@@ -279,7 +275,7 @@ protected:
         Node* old_parent = current;
         Node* new_parent = current->right->left;
         Node* subnode = current->right;
-        if (subnode != nullptr) {
+        /*if (subnode != nullptr) {
             subnode->parent = old_parent;
         }
         if (old_parent->parent != nullptr) {
@@ -292,9 +288,8 @@ protected:
         }
         else {
             root = new_parent;
-        }
+        }*/
         subnode = right_rotation(subnode);
-        old_parent->right = subnode;
         old_parent = left_rotation(old_parent);
         return new_parent;
     }
@@ -405,8 +400,6 @@ public:
 int main()
 {
     std::cout << "There is an example of red-black-tree with int-data. " << std::endl;
-    RedBlackTree rbt = { 10, 20 };
-    rbt.insert(15);
-    //rbt.insert(40);
+    RedBlackTree rbt = { 10, 20, 12, 30, 5, 25, 17, 16, 15 };
     return 0;
 }
