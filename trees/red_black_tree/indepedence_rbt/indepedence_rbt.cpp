@@ -9,6 +9,7 @@ protected:
         black,
         red
     };
+private:
     struct Node {
         int data;
         Node* right;
@@ -18,9 +19,9 @@ protected:
     };
     Node* root;
 
-    bool valide_properties() {
+    /*bool valide_properties() {
 
-    }
+    }*/
 
 
     void inorder_traversal_recursive(Node* current) {
@@ -66,9 +67,9 @@ protected:
 
 
 
-    bool search_recursive(Node* current, const int& val) {
+    Node* search_recursive(Node* current, const int val) {
         if (current == nullptr) {
-            return false;
+            return nullptr;
         }
         if (current->data != val) {
             if (current->data > val) {
@@ -78,7 +79,7 @@ protected:
                 return search_recursive(current->right, val);
             }
         }
-        return true;
+        return current;
     }
 
 
@@ -153,8 +154,96 @@ protected:
         return current;
     }
 
-    void fixup_propertions_remove(Node* current, Node* temp) {
-        current->color = temp->color;
+    void fixup_propertions_remove(Node* double_black_node, Node* deleted_parent, Color deleted_color) {
+        if (double_black_node != nullptr) {
+            if (deleted_color == Color::red) {
+                return;
+            }
+            else if (deleted_color == Color::black && double_black_node->color == Color::red) {
+                double_black_node->color = Color::black;
+            }
+            else {
+                Node* brother = (double_black_node->data < double_black_node->parent->data) ? double_black_node->parent->right : double_black_node->parent->left;
+                if (deleted_color == Color::red) {
+                    return;
+                }
+                else if (deleted_color == Color::black && double_black_node->color == Color::red) {
+                    double_black_node->color = Color::black;
+                }
+                if (brother->color == Color::red) {
+                    deleted_parent = left_rotation(deleted_parent);
+                    deleted_parent->color = brother->color;
+                    brother->color = Color::black;
+                }
+                else if (brother->color == Color::black && brother->left->color == Color::red) {
+                    Color sibling_color = brother->color;
+                    Color sibling_child_color = brother->left->color;
+                    brother->color = sibling_child_color;
+                    brother->left->color = sibling_color;
+                    brother = right_rotation(brother);
+                }
+                if (brother->color == Color::black && brother->right->color == Color::red) {
+                    deleted_parent = left_rotation(deleted_parent);
+                    deleted_parent->color = Color::red;
+                    deleted_parent->left->color = Color::black;
+                    deleted_parent->right->color = Color::black;
+                }
+                else if (brother->color == Color::black && (brother->left->color == Color::black && brother->right->color == Color::black)) {
+                    if (deleted_parent->color == Color::red) {
+                        brother->color = Color::red;
+                        deleted_parent->color = Color::black;
+                    }
+                    else {
+                        fixup_propertions_remove(deleted_parent, deleted_parent->parent, Color::black);
+                    }
+                }
+            }
+        }
+        else {
+            Node* brother = (deleted_parent->data < deleted_parent->parent->data) ? deleted_parent->left : deleted_parent->right;
+            if (deleted_color == Color::red) {
+                return;
+            }
+            else if (deleted_color == Color::black && (double_black_node != nullptr && double_black_node->color == Color::red)) {
+                double_black_node->color = Color::black;
+            }
+            if (brother->color == Color::red) {
+                deleted_parent = left_rotation(deleted_parent);
+                deleted_parent->color = brother->color;
+                brother->color = Color::black;
+            }
+            else if (brother->color == Color::black && (brother->left != nullptr && brother->left->color == Color::red)) {
+                Color sibling_color = brother->color;
+                Color sibling_child_color = brother->left->color;
+                brother->color = sibling_child_color;
+                brother->left->color = sibling_color;
+                brother = right_rotation(brother);
+            }
+            if (brother->color == Color::black && (brother->right != nullptr && brother->right->color == Color::red)) {
+                deleted_parent = left_rotation(deleted_parent);
+                deleted_parent->color = brother->color;
+                deleted_parent->left->color = Color::black;
+                deleted_parent->right->color = Color::black;
+            }
+            else if (brother->color == Color::black && (brother->left != nullptr && brother->right != nullptr && (brother->left->color == Color::black && brother->right->color == Color::black))) {
+                if (deleted_parent->color == Color::red) {
+                    brother->color = Color::red;
+                    deleted_parent->color = Color::black;
+                }
+                else {
+                    fixup_propertions_remove(deleted_parent, deleted_parent->parent, Color::black);
+                }
+            }
+            else if (brother->color == Color::black && (brother->left == nullptr && brother->right == nullptr)) {
+                if (deleted_parent->color == Color::red) {
+                    brother->color = Color::red;
+                    deleted_parent->color = Color::black;
+                }
+                else {
+                    fixup_propertions_remove(deleted_parent, deleted_parent->parent, Color::black);
+                }
+            }
+        }
     }
 
     Node* insert_recursive(Node* current, Node* current_parent, const int& val) {
@@ -171,36 +260,68 @@ protected:
         }
         return fixup_propertions_insert(current);
     }
-    Node* remove_recursive(Node* current, const int& val) {
+    void remove_iterative(Node* current, const int& val) {
+        while (current != nullptr && current->data != val) {
+            if (val < current->data) {
+                current = current->left;
+            }
+            else if (val > current->data) {
+                current = current->right;
+            }
+        }
         if (current == nullptr) {
-            return nullptr;
-        }
-        if (val < current->data) {
-            current->left = remove_recursive(current->left, val);
-        }
-        else if (val > current->data) {
-            current->right = remove_recursive(current->right, val);
+            return;
         }
         else {
             if (current->left != nullptr && current->right != nullptr) {
-                Node* temp = inorder_succesor(current->right);
+                Node* temp = inorder_preccesor(current->left);
                 current->data = temp->data;
-                current->right = remove_recursive(current->right, temp->data);
+                Node* current_parent = current->parent;
+                Color current_color = current->color;
+                if (temp->left != nullptr && temp->right != nullptr) {
+                    Node* temp_of_temp = temp->left;
+                    Node* temp_parent = temp->parent;
+                    Color temp_color = temp->color;
+                    if (temp_of_temp != nullptr) {
+                        temp_of_temp->parent = temp->parent;
+                    }
+
+                    if (temp->data < temp_parent->data) {
+                        temp_parent->left = temp_of_temp;
+                    }
+                    else {
+                        temp_parent->right = temp_of_temp;
+                    }
+                    delete temp;
+                    fixup_propertions_remove(temp_of_temp, temp_parent, temp_color);
+                }
+                else {
+                    delete temp;
+                    current->left = nullptr;
+                    fixup_propertions_remove(nullptr, current, Color::black);
+                }
             }
             else if (current->left == nullptr) {
+                Color current_color = current->color;
                 Node* temp = current->right;
-                current->color = temp->color;
+                Node* current_parent = current->parent;
+                if (current->data < current->parent->data) {
+                    current->parent->left = nullptr;
+                }
+                else {
+                    current->parent->right = nullptr;
+                }
                 delete current;
-                return temp;
+                fixup_propertions_remove(temp, current_parent, current_color);
             }
             else {
+                Color current_color = current->color;
                 Node* temp = current->left;
-                current->color = temp->color;
+                Node* current_parent = current->parent;
                 delete current;
-                return temp;
+                fixup_propertions_remove(temp, current_parent, current_color);
             }
         }
-        return current;
     }
 
 
@@ -360,7 +481,7 @@ public:
 
 
 
-    bool search(const int& val) {
+    Node* search(const int& val) {
         return search_recursive(root, val);
     }
     void insert(const int& val) {
@@ -368,7 +489,7 @@ public:
         root = insert_recursive(root, next_parent, val);
     }
     void remove(const int& val) {
-        root = remove_recursive(root, val);
+        remove_iterative(root, val);
     }
     void inorder_traversal() {
         inorder_traversal_recursive(root);
@@ -379,6 +500,16 @@ public:
     void preorder_traversal() {
         preorder_traversal_recursive(root);
     }
+
+
+    /*void full_black_tree() {
+        RedBlackTree rbt = { 10, 20, 12, 30, 5, 25, 17, 16, 15, 40, 29, 50 };
+        rbt.remove(50);
+        rbt.remove(5);
+        rbt.remove(15);
+        rbt.remove(30);
+        rbt.remove(40);
+    }*/
 };
 
 
@@ -386,6 +517,11 @@ public:
 int main()
 {
     std::cout << "There is an example of red-black-tree with int-data. " << std::endl;
-    RedBlackTree rbt = { 10, 20, 12, 30, 5, 25, 17, 16, 15 };
+    RedBlackTree rbt = { 10, 20, 12, 30, 5, 25, 17, 16, 15, 40, 29, 50 };
+    rbt.remove(50);
+    rbt.remove(5);
+    rbt.remove(15);
+    rbt.remove(30);
+    rbt.remove(40);
     return 0;
 }
