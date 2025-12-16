@@ -19,10 +19,6 @@ private:
     };
     Node* root;
 
-    /*bool valide_properties() {
-
-    }*/
-
 
     void inorder_traversal_recursive(Node* current) {
         if (current == nullptr) {
@@ -155,6 +151,11 @@ private:
     }
 
     void fixup_propertions_remove(Node* double_black_node, Node* deleted_parent, int double_black_node_data, Color deleted_color) {
+        if (deleted_color == Color::red) {
+            return;
+        }
+
+
         Node* brother;
         if (double_black_node != root && deleted_parent != nullptr) {
             brother = (double_black_node_data < deleted_parent->data) ? deleted_parent->right : deleted_parent->left;
@@ -164,24 +165,16 @@ private:
             return;
         }
 
+
         if (double_black_node != nullptr) {
             if (double_black_node == root) {
                 double_black_node->color = Color::black;
             }
             else {
-                if (deleted_color == Color::red) {
-                    return;
-                }
-                else if (deleted_color == Color::black && double_black_node->color == Color::red) {
+                if (deleted_color == Color::black && double_black_node->color == Color::red) {
                     double_black_node->color = Color::black;
                 }
                 else {
-                    if (deleted_color == Color::red) {
-                        return;
-                    }
-                    else if (deleted_color == Color::black && double_black_node->color == Color::red) {
-                        double_black_node->color = Color::black;
-                    }
                     if (brother->color == Color::red) {
                         deleted_parent = left_rotation(deleted_parent);
                         deleted_parent->color = brother->color;
@@ -214,12 +207,8 @@ private:
             }
         }
         else {
-            /*Node* brother = (deleted_parent->data < deleted_parent->parent->data) ? deleted_parent->left : deleted_parent->right;*/
             if (brother != nullptr) {
-                if (deleted_color == Color::red) {
-                    return;
-                }
-                else if (deleted_color == Color::black && (double_black_node != nullptr && double_black_node->color == Color::red)) {
+                if (deleted_color == Color::black && (double_black_node != nullptr && double_black_node->color == Color::red)) {
                     double_black_node->color = Color::black;
                 }
                 if (brother->color == Color::red) {
@@ -519,7 +508,9 @@ public:
 int main()
 {
     std::cout << "There is an example of red-black-tree with int-data. " << std::endl;
+
     RedBlackTree rbt = { 10, 20, 12, 30, 5, 25, 17, 16, 15, 40, 29, 50 };
+
     rbt.remove(50);
     rbt.remove(5);
     rbt.remove(15);
@@ -527,6 +518,7 @@ int main()
     rbt.remove(40);
 
     rbt.remove(17);
-    //rbt.remove(10);
+
+    rbt.remove(25);
     return 0;
 }
