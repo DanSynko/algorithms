@@ -176,48 +176,42 @@ private:
         }
 
 
-
-        if (brother != nullptr) {
-            if (brother->color == Color::red) {
-                deleted_parent = left_rotation(deleted_parent);
-                deleted_parent->color = brother->color;
-                brother->color = Color::black;
+        if (brother->color == Color::red) {
+            deleted_parent = left_rotation(deleted_parent);
+            deleted_parent->color = brother->color;
+            brother->color = Color::black;
+        }
+        else if (brother->color == Color::black && (brother->left != nullptr && brother->left->color == Color::red)) {
+            Color sibling_color = brother->color;
+            Color sibling_child_color = brother->left->color;
+            brother->color = sibling_child_color;
+            brother->left->color = sibling_color;
+            brother = right_rotation(brother);
+        }
+        if (brother->color == Color::black && (brother->right != nullptr && brother->right->color == Color::red)) {
+            deleted_parent = left_rotation(deleted_parent);
+            deleted_parent->color = brother->color;
+            deleted_parent->left->color = Color::black;
+            deleted_parent->right->color = Color::black;
+        }
+        else if (brother->color == Color::black && (brother->left != nullptr && brother->right != nullptr && (brother->left->color == Color::black && brother->right->color == Color::black))) {
+            if (deleted_parent->color == Color::red) {
+                brother->color = Color::red;
+                deleted_parent->color = Color::black;
             }
-            else if (brother->color == Color::black && (brother->left != nullptr && brother->left->color == Color::red)) {
-                Color sibling_color = brother->color;
-                Color sibling_child_color = brother->left->color;
-                brother->color = sibling_child_color;
-                brother->left->color = sibling_color;
-                brother = right_rotation(brother);
-            }
-            if (brother->color == Color::black && (brother->right != nullptr && brother->right->color == Color::red)) {
-                deleted_parent = left_rotation(deleted_parent);
-                deleted_parent->color = brother->color;
-                deleted_parent->left->color = Color::black;
-                deleted_parent->right->color = Color::black;
-            }
-            else if (brother->color == Color::black && (brother->left != nullptr && brother->right != nullptr && (brother->left->color == Color::black && brother->right->color == Color::black))) {
-                if (deleted_parent->color == Color::red) {
-                    brother->color = Color::red;
-                    deleted_parent->color = Color::black;
-                }
-                else {
-                    fixup_properties_remove(deleted_parent, deleted_parent->parent, double_black_node_data, Color::black);
-                }
-            }
-            else if (brother->color == Color::black && (brother->left == nullptr && brother->right == nullptr)) {
-                if (deleted_parent->color == Color::red) {
-                    brother->color = Color::red;
-                    deleted_parent->color = Color::black;
-                }
-                else {
-                    brother->color = Color::red;
-                    fixup_properties_remove(deleted_parent, deleted_parent->parent, double_black_node_data, Color::black);
-                }
+            else {
+                fixup_properties_remove(deleted_parent, deleted_parent->parent, double_black_node_data, Color::black);
             }
         }
-        else {
-            Color brother_color = Color::black;
+        else if (brother->color == Color::black && (brother->left == nullptr && brother->right == nullptr)) {
+            if (deleted_parent->color == Color::red) {
+                brother->color = Color::red;
+                deleted_parent->color = Color::black;
+            }
+            else {
+                brother->color = Color::red;
+                fixup_properties_remove(deleted_parent, deleted_parent->parent, double_black_node_data, Color::black);
+            }
         }
     }
 
