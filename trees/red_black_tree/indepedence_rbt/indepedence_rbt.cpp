@@ -80,7 +80,7 @@ private:
 
 
 
-    Node* fixup_propertions_insert(Node* current) {
+    Node* fixup_properties_insert(Node* current) {
         // left rotation
         if ((current->right != nullptr && current->right->right != nullptr) && (current->right->color == Color::red && current->right->right->color == Color::red)) {
             if (current->left == nullptr) {
@@ -150,8 +150,12 @@ private:
         return current;
     }
 
-    void fixup_propertions_remove(Node* double_black_node, Node* deleted_parent, int double_black_node_data, Color deleted_color) {
+    void fixup_properties_remove(Node* double_black_node, Node* deleted_parent, int double_black_node_data, Color deleted_color) {
         if (deleted_color == Color::red) {
+            return;
+        }
+        else if (deleted_color == Color::black && (double_black_node != nullptr && double_black_node->color == Color::red)) {
+            double_black_node->color = Color::black;
             return;
         }
 
@@ -161,7 +165,7 @@ private:
             brother = (double_black_node_data < deleted_parent->data) ? deleted_parent->right : deleted_parent->left;
         }
         else {
-            root->color = Color::black;
+            if (root != nullptr) root->color = Color::black;
             return;
         }
 
@@ -171,46 +175,38 @@ private:
                 double_black_node->color = Color::black;
             }
             else {
-                if (deleted_color == Color::black && double_black_node->color == Color::red) {
-                    double_black_node->color = Color::black;
+                if (brother->color == Color::red) {
+                    deleted_parent = left_rotation(deleted_parent);
+                    deleted_parent->color = brother->color;
+                    brother->color = Color::black;
                 }
-                else {
-                    if (brother->color == Color::red) {
-                        deleted_parent = left_rotation(deleted_parent);
-                        deleted_parent->color = brother->color;
-                        brother->color = Color::black;
+                else if (brother->color == Color::black && brother->left->color == Color::red) {
+                    Color sibling_color = brother->color;
+                    Color sibling_child_color = brother->left->color;
+                    brother->color = sibling_child_color;
+                    brother->left->color = sibling_color;
+                    brother = right_rotation(brother);
+                }
+                if (brother->color == Color::black && brother->right->color == Color::red) {
+                    deleted_parent = left_rotation(deleted_parent);
+                    deleted_parent->color = Color::red;
+                    deleted_parent->left->color = Color::black;
+                    deleted_parent->right->color = Color::black;
+                }
+                else if (brother->color == Color::black && (brother->left->color == Color::black && brother->right->color == Color::black)) {
+                    if (deleted_parent->color == Color::red) {
+                        brother->color = Color::red;
+                        deleted_parent->color = Color::black;
                     }
-                    else if (brother->color == Color::black && brother->left->color == Color::red) {
-                        Color sibling_color = brother->color;
-                        Color sibling_child_color = brother->left->color;
-                        brother->color = sibling_child_color;
-                        brother->left->color = sibling_color;
-                        brother = right_rotation(brother);
-                    }
-                    if (brother->color == Color::black && brother->right->color == Color::red) {
-                        deleted_parent = left_rotation(deleted_parent);
-                        deleted_parent->color = Color::red;
-                        deleted_parent->left->color = Color::black;
-                        deleted_parent->right->color = Color::black;
-                    }
-                    else if (brother->color == Color::black && (brother->left->color == Color::black && brother->right->color == Color::black)) {
-                        if (deleted_parent->color == Color::red) {
-                            brother->color = Color::red;
-                            deleted_parent->color = Color::black;
-                        }
-                        else {
-                            brother->color = Color::red;
-                            fixup_propertions_remove(deleted_parent, deleted_parent->parent, double_black_node_data, Color::black);
-                        }
+                    else {
+                        brother->color = Color::red;
+                        fixup_properties_remove(deleted_parent, deleted_parent->parent, double_black_node_data, Color::black);
                     }
                 }
             }
         }
         else {
             if (brother != nullptr) {
-                if (deleted_color == Color::black && (double_black_node != nullptr && double_black_node->color == Color::red)) {
-                    double_black_node->color = Color::black;
-                }
                 if (brother->color == Color::red) {
                     deleted_parent = left_rotation(deleted_parent);
                     deleted_parent->color = brother->color;
@@ -235,7 +231,7 @@ private:
                         deleted_parent->color = Color::black;
                     }
                     else {
-                        fixup_propertions_remove(deleted_parent, deleted_parent->parent, double_black_node_data, Color::black);
+                        fixup_properties_remove(deleted_parent, deleted_parent->parent, double_black_node_data, Color::black);
                     }
                 }
                 else if (brother->color == Color::black && (brother->left == nullptr && brother->right == nullptr)) {
@@ -245,7 +241,7 @@ private:
                     }
                     else {
                         brother->color = Color::red;
-                        fixup_propertions_remove(deleted_parent, deleted_parent->parent, double_black_node_data, Color::black);
+                        fixup_properties_remove(deleted_parent, deleted_parent->parent, double_black_node_data, Color::black);
                     }
                 }
             }
@@ -267,7 +263,7 @@ private:
                 current->right = insert_recursive(current->right, current, val);
             }
         }
-        return fixup_propertions_insert(current);
+        return fixup_properties_insert(current);
     }
     void remove_iterative(Node* current, const int& val) {
         while (current != nullptr && current->data != val) {
@@ -278,7 +274,14 @@ private:
                 current = current->right;
             }
         }
+
+
         if (current == nullptr) {
+            return;
+        }
+        else if (current == root && (root->right == nullptr && root->left == nullptr)) {
+            delete root;
+            root = nullptr;
             return;
         }
         else {
@@ -302,7 +305,7 @@ private:
                 }
                 int current_data = current->data;
                 delete current;
-                fixup_propertions_remove(temp, current_parent, current_data, current_color);
+                fixup_properties_remove(temp, current_parent, current_data, current_color);
             }
             else {
                 Color current_color = current->color;
@@ -310,7 +313,7 @@ private:
                 Node* current_parent = current->parent;
                 int current_data = current->data;
                 delete current;
-                fixup_propertions_remove(temp, current_parent, current_data, current_color);
+                fixup_properties_remove(temp, current_parent, current_data, current_color);
             }
         }
     }
