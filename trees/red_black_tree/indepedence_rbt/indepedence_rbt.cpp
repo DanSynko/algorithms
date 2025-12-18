@@ -243,39 +243,37 @@ private:
         if (current == nullptr) {
             return;
         }
-        else if (current == root && (root->right == nullptr && root->left == nullptr)) {
+        else if (current == root && (root->left == nullptr || root->right == nullptr)) {
+            Node* new_root = (root->left == nullptr) ? root->right : root->left;
+            if (new_root != nullptr) {
+                new_root->parent = nullptr;
+                new_root->color = Color::black;
+            }
             delete root;
-            root = nullptr;
+            root = new_root;
             return;
         }
         else {
             if (current->left != nullptr && current->right != nullptr) {
                 Node* temp = inorder_preccesor(current->left);
-                int temp_data = temp->data;
                 Node* current_parent = current->parent;
+                int temp_data = temp->data;
                 Color current_color = current->color;
                 remove_iterative(temp, temp->data);
                 current->data = temp_data;
             }
-            else if (current->left == nullptr) {
+            else if (current->left == nullptr || current->right == nullptr) {
+                Node* temp = (current->left == nullptr) ? current->right : current->left;
                 Color current_color = current->color;
-                Node* temp = current->right;
                 Node* current_parent = current->parent;
+                int current_data = current->data;
                 if (current->data < current->parent->data) {
-                    current->parent->left = nullptr;
+                    current->parent->left = temp;
                 }
                 else {
-                    current->parent->right = nullptr;
+                    current->parent->right = temp;
                 }
-                int current_data = current->data;
-                delete current;
-                fixup_properties_remove(temp, current_parent, current_data, current_color);
-            }
-            else {
-                Color current_color = current->color;
-                Node* temp = current->left;
-                Node* current_parent = current->parent;
-                int current_data = current->data;
+                if (temp != nullptr) temp->parent = current->parent;
                 delete current;
                 fixup_properties_remove(temp, current_parent, current_data, current_color);
             }
